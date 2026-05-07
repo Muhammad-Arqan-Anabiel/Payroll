@@ -19,7 +19,8 @@
                     <h2 class="text-2xl font-bold mb-2">Presensi</h2>
                     
                     <div id="map" class="mb-4 rounded-lg border border-gray-300" style="height: 300px;"></div>
-                    <button type="button" onclick="tagLocation()" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded mt-2">Tag Location</button>
+                    <button type="button" onclick="tagLocation()" class="px-4 py-2 bg-blue-500 text-white rounded">Tag Location</button>
+                    <button type="submit" class="px-4 py-2 bg-green-500 text-white rounded">Submit Presensi</button>
                 </div>
             </div>
         </div>
@@ -30,39 +31,52 @@
 <script>
     var map = L.map('map').setView([{{ $schedule->office->latitude }}, {{ $schedule->office->longitude }}], 17);
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map);
 
-    var marker = L.marker([{{ $schedule->office->latitude }}, {{ $schedule->office->longitude }}]).addTo(map);    
-    marker.bindPopup("<b>Kantor:</b> {{ $schedule->office->name }}").openPopup();
+    var officeMarker = L.marker([{{ $schedule->office->latitude }}, {{ $schedule->office->longitude }}]).addTo(map);    
+    officeMarker.bindPopup("<b>Kantor:</b> {{ $schedule->office->name }}").openPopup();
 
-    var circle = L.circle([{{ $schedule->office->latitude }}, {{ $schedule->office->longitude }}], {
+    let marker;
+    const office = [{{ $schedule->office->latitude }}, {{ $schedule->office->longitude }}];
+    const radius = {{ $schedule->office->radius }};
+
+    var circle = L.circle(office, {
         color: 'red',
         fillColor: '#f03',
         fillOpacity: 0.5,
-        radius: {{ $schedule->office->radius }}
+        radius: radius
     }).addTo(map);
-
-    let userMarker;
 
     function tagLocation() {
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function (position) {
+            navigator.geolocation.getCurrentPosition(function(position) {
                 const lat = position.coords.latitude;
                 const lng = position.coords.longitude;
 
-                if (userMarker) {
-                    map.removeLayer(userMarker);
+                if (marker) {
+                    map.removeLayer(marker);
                 }
 
-                userMarker = L.marker([lat, lng]).addTo(map);
-                userMarker.bindPopup("<b>Hello world!</b><br>I am {{ $schedule->user->name }}").openPopup();
+                marker = L.marker([lat, lng]).addTo(map);
+                marker.bindPopup("<b>Hello world!</b><br>I am {{ $schedule->user->name }}").openPopup();
                 map.setView([lat, lng], 18);
-            });
+
+                if (isWithinRadius(lat, lng, office, radius)) {
+                    alert('Anda berada di dalam radius kantor!');
+                } else {
+                    alert('Anda tidak berada di dalam radius kantor!');
+                }
+            })
         } else {
-            alert('Tidak bisa tag location!');
+            alert('Tidak bisa tag location!')
         }
+    }
+
+    function isWithinRadius(lat, lng, center, radius) {
+        let distance = map.distance([lat, lng], center);
+        return distance <= radius;
     }
 </script>
 @endif
