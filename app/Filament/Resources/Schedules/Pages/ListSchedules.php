@@ -17,10 +17,8 @@ class ListSchedules extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('presensi')
-                ->url('presensi')
-                ->color('success'),
-            CreateAction::make(),
+            
+            Actions\CreateAction::make(),
         ];
     }
 

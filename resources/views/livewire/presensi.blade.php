@@ -9,16 +9,23 @@
                             <p><strong>Nama Pegawai: </strong>{{ $schedule->user->name }}</p>
                             <p><strong>Kantor: </strong>{{ $schedule->office->name }}</p>
                             <p><strong>Shift: </strong>{{ $schedule->shift->name }} ({{ $schedule->shift->start_time }} - {{ $schedule->shift->end_time }})</p>
-                        @else
+                            @if ($schedule->is_wfa)
+                            <p class="text-green-500"><strong>Status: </strong> WFA </p>
+                            @else
+                            <p class="text-green-500"><strong>Status: </strong> WFO </p>
+                            @endif
+                            @else
                             <p class="text-red-500"><strong>Anda belum memiliki jadwal hari ini.</strong></p>
-                        @endif
+                            @endif
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
                         <div class="bg-gray-100 p-4 rounded-lg">
-                            <h4 class="text-lg font bold mb-2">Jam Masuk</h4>
+                            <h4 class="text-lg font-bold mb-2">Jam Masuk</h4>
+                            <p><strong>{{ $attendance?->start_time ?? '-' }}</strong></p>
                         </div>
                         <div class="bg-gray-100 p-4 rounded-lg">
-                            <h4 class="text-lg font bold mb-2">Jam Pulang</h4>
+                            <h4 class="text-lg font-bold mb-2">Jam Keluar</h4>
+                            <p><strong>{{ $attendance?->end_time ?? '-' }}</strong></p>
                         </div>
                     </div>
                 </div>
@@ -27,10 +34,12 @@
                     <h2 class="text-2xl font-bold mb-2">Presensi</h2>
                     
                     <div id="map" class="mb-4 rounded-lg border border-gray-300" style="height: 300px;" wire:ignore></div>
-                    <button type="button" onclick="tagLocation()" class="cursor-pointer px-4 py-2 bg-blue-500 text-white rounded transition-all duration-300 hover:bg-blue-600 hover:shadow-lg hover:-translate-y-1 active:scale-95">Tag Location</button>
-                    @if ($insideRadius)
-                    <button type="submit" class="cursor-pointer px-4 py-2 bg-green-500 text-white rounded transition-all duration-300 hover:bg-green-600 hover:shadow-lg hover:-translate-y-1 active:scale-95">Submit Presensi</button>
-                    @endif
+                    <form wire:submit="store" class="flex justify-between" enctype="multipart/form-data">
+                        <button type="button" onclick="tagLocation()" class="cursor-pointer px-4 py-2 bg-blue-500 text-white rounded transition-all duration-300 hover:bg-blue-600 hover:shadow-lg hover:-translate-y-1 active:scale-95">Tag Location</button>
+                        @if ($insideRadius)
+                        <button type="submit" class="cursor-pointer px-4 py-2 bg-green-500 text-white rounded transition-all duration-300 hover:bg-green-600 hover:shadow-lg hover:-translate-y-1 active:scale-95">Submit Presensi</button>
+                        @endif
+                    </form>
                 </div>
             </div>
         </div>
@@ -44,6 +53,7 @@
     let lng;
     let marker;
     let component;
+    const isWfa = @json($schedule->is_wfa);
     const office = [{{ $schedule->office->latitude }}, {{ $schedule->office->longitude }}];
     // Multiply by 3 to make the circle 3x wider
     const radius = {{ $schedule->office->radius }} * 3;
@@ -83,10 +93,18 @@
 
                 if (isWithinRadius(lat, lng, office, radius)) {
                     component.set('insideRadius', true);
+                    component.set('latitude', lat);
+                    component.set('longitude', lng);
                     alert('Anda berada di dalam radius kantor!');
                 } else {
-                    component.set('insideRadius', false);
-                    alert('Anda tidak berada di dalam radius kantor!');
+                    if (isWfa) {
+                        component.set('insideRadius', true);
+                        component.set('latitude', lat);
+                        component.set('longitude', lng);
+                        alert('Anda WFA!');
+                    } else {
+                        alert('Anda tidak berada di dalam radius kantor!');
+                    }
                 }
             })
         } else {
