@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Users\Schemas;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\FileUpload;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -27,6 +28,11 @@ class UserForm
                         Select::make('roles.name')
                             ->label('Role')
                             ->relationship('roles', 'name'),
+                        FileUpload::make('avatar')
+                                ->image()
+                                ->disk('public')
+                                ->directory('avatars')
+                                ->preserveFilenames(),
                     ])
                 ]),
                 Group::make()->components([
@@ -37,7 +43,7 @@ class UserForm
                             ->password()
                             ->dehydrateStateUsing(fn ($state) => Hash::make($state))
                             ->dehydrated(fn ($state) => filled($state))
-                            ->required(fn (string $context): bool => $context === 'çreate' ),
+                            ->required(fn (string $context): bool => $context === 'create' ),
                     ])
                 ]),
             ]);

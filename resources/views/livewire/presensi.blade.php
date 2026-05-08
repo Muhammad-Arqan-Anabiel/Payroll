@@ -34,11 +34,9 @@
                     <h2 class="text-2xl font-bold mb-2">Presensi</h2>
                     
                     <div id="map" class="mb-4 rounded-lg border border-gray-300" style="height: 300px;" wire:ignore></div>
-                    <form wire:submit="store" class="flex justify-between" enctype="multipart/form-data">
+                    <form wire:submit.prevent="store" class="flex justify-between" x-data="{ showSubmit: @entangle('insideRadius') }">
                         <button type="button" onclick="tagLocation()" class="cursor-pointer px-4 py-2 bg-blue-500 text-white rounded transition-all duration-300 hover:bg-blue-600 hover:shadow-lg hover:-translate-y-1 active:scale-95">Tag Location</button>
-                        @if ($insideRadius)
-                        <button type="submit" class="cursor-pointer px-4 py-2 bg-green-500 text-white rounded transition-all duration-300 hover:bg-green-600 hover:shadow-lg hover:-translate-y-1 active:scale-95">Submit Presensi</button>
-                        @endif
+                        <button type="submit" x-show="showSubmit" x-cloak class="cursor-pointer px-4 py-2 bg-green-500 text-white rounded transition-all duration-300 hover:bg-green-600 hover:shadow-lg hover:-translate-y-1 active:scale-95">Submit Presensi</button>
                     </form>
                 </div>
             </div>

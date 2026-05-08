@@ -18,6 +18,7 @@ class ScheduleForm
             ->components([
                 Group::make()->components([
                     Section::make()->components([
+                        Toggle::make('is_banned'),
                         Select::make('user_id')
                             ->label('Nama Pegawai')
                             ->relationship('user', 'name')

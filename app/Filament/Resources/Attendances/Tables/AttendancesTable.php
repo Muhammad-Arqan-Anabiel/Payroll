@@ -16,16 +16,62 @@ class AttendancesTable
         return $table
             ->columns([
                 TextColumn::make('created_at')
-                    ->label('Tanggal')
                     ->date()
-                    ->sortable(),
+                    ->sortable()
+                    ->label('Tanggal'),
                 TextColumn::make('user.name')
-                    ->label('Pegawai')
-                    ->sortable(),
+                    ->searchable()
+                    ->label('Nama Pegawai'),
+                TextColumn::make('schedule_latitude')
+                    ->numeric()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('schedule_longitude')
+                    ->numeric()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('schedule_start_time')
+                    ->time()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('schedule_end_time')
+                    ->time()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('latitude')
+                    ->numeric()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('longitude')
+                    ->numeric()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('start_time')
-                    ->label('Waktu Datang'),
+                    ->time()
+                    ->label('Jam Masuk')
+                    ->sortable(),
                 TextColumn::make('end_time')
-                    ->label('Waktu Pulang'),
+                    ->label('Jam Keluar')
+                    ->time()
+                    ->sortable(),
+                TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                Tables\Columns\TextCollumn::make('isLate')
+                    ->label('status')
+                    ->badge()
+                    ->getStateUsing(function ($record) {
+                        return $record->isLate() ? 'Terlambat' : 'Tepat Waktu';
+                    })
+                    ->color(fn(string $state):string => match ($state) {
+                        'Tepat Waktu' => 'success',
+                        'Terlambat' => 'danger',
+                    })
+                    ->description(function (Attendance $record) {
+                        return "Durasi: " . $record->wordDuration();
+                    }),
             ])
             ->filters([
                 //

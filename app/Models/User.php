@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable
 {
@@ -42,5 +43,22 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    protected static function booted()
+    {
+        static::updating(function ($user) {
+            if ($user->isDirty('avatar')) {
+                $original = $user->getOriginal('avatar');
+                if ($original && Storage::disk('public')->exists($original)) {
+                    Storage::disk('public')->delete($original);
+                }
+            }
+        });
+        static::deleting(function ($user) {
+            if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+        }); 
     }
 }
