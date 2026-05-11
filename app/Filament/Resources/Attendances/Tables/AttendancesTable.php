@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Attendances\Tables;
 
+use App\Models\Attendance;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -59,7 +60,7 @@ class AttendancesTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                Tables\Columns\TextCollumn::make('isLate')
+                TextColumn::make('isLate')
                     ->label('status')
                     ->badge()
                     ->getStateUsing(function ($record) {
