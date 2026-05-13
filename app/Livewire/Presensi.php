@@ -49,6 +49,7 @@ class Presensi extends Component
                     'longitude' => $this->longitude,
                     'start_time' => Carbon::now()->toTimeString(),
                     'end_time' => Carbon::now()->toTimeString(),
+                    'duration' => null,
                 ]);
 
                 Notification::make()
@@ -57,10 +58,16 @@ class Presensi extends Component
                     ->body("presensi berhasil dibuat")
                     ->send();
             } else {
+                $startTime = Carbon::parse($attendance->start_time);
+                $endTime = Carbon::now();
+
+                $duration = $startTime->diff($endTime)->format('%H:%I:%S'); 
                 $attendance->update([
+
                     'latitude' => $this->latitude,
                     'longitude' => $this->longitude,
                     'end_time' => Carbon::now()->toTimeString(),
+                    'duration' => $duration,
                 ]);
 
                 Notification::make()

@@ -54,7 +54,11 @@ class AttendancesTable
                 TextColumn::make('end_time')
                     ->label('Jam Keluar')
                     ->time()
-                    ->sortable(),
+                    ->sortable()
+                    ->getStateUsing(function ($record) {
+                        return $record->start_time !== $record->end_time ? $record->end_time : null;
+                    })
+                    ->placeholder('Masih Bekerja'),
                 TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()

@@ -27,7 +27,7 @@ class Attendance extends Model
     public function wordDuration()
     {
         $startTime = Carbon::parse($this->start_time);
-        $endTime = Carbon::parse($this->end_time);
+        $endTime = $this->start_time !== $this->end_time ? Carbon::parse($this->end_time) : Carbon::now();
 
        $duration = $startTime->diff($endTime);
 
